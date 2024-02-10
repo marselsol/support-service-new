@@ -1,6 +1,7 @@
 package com.example.servlets;
 
 import com.example.repository.PhraseStorage;
+import com.example.utils.beans.factory.stereotype.ComponentMarsel;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
+@ComponentMarsel
 public class HelpServlet extends HttpServlet {
 
     @Override

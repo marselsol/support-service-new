@@ -1,5 +1,7 @@
 package com.example.repository;
 
+import com.example.utils.beans.factory.stereotype.ComponentMarsel;
+import com.example.utils.beans.factory.stereotype.RepositoryMarsel;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
+@RepositoryMarsel
 public class PhraseStorage {
     private static final List<String> phrases = new CopyOnWriteArrayList<>();
 
