@@ -1,15 +1,31 @@
 package com.example.repository;
 
+import com.example.servlets.HelpServlet;
+import com.example.utils.beans.factory.BeanFactoryMarsel;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class PhraseStorageTest {
+    private PhraseStorage phraseStorage;
+
+    @BeforeEach
+    void setUp() {
+        BeanFactoryMarsel beanFactory = new BeanFactoryMarsel();
+        beanFactory.fillSingletonsMap("com.example");
+        beanFactory.fillAutowired();
+
+        HelpServlet servlet = new HelpServlet();
+        servlet.setPhraseStorage(new PhraseStorage());
+        phraseStorage = new PhraseStorage();
+    }
+
     @Test
     void testAddAndGetPhrase() {
-        PhraseStorage.addPhrase("Test phrase!");
-        String phrase = PhraseStorage.getRandomPhrase();
+        phraseStorage.addPhrase("Test phrase!");
+        String phrase = phraseStorage.getRandomPhrase();
         assertNotNull(phrase);
         assertEquals("Test phrase!", phrase);
     }

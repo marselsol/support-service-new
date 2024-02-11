@@ -14,12 +14,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class PhraseStorage {
     private static final List<String> phrases = new CopyOnWriteArrayList<>();
 
-    public static void addPhrase(String phrase) {
+    public void addPhrase(String phrase) {
         phrases.add(phrase);
         log.info("New phrase added: {}", phrase);
     }
 
-    public static String getRandomPhrase() throws NoSuchElementException {
+    public String getRandomPhrase() throws NoSuchElementException {
         if (phrases.isEmpty()) {
             throw new NoSuchElementException();
         }
@@ -28,7 +28,7 @@ public class PhraseStorage {
         return phrase;
     }
 
-    public static void clearPhrases() {
+    public void clearPhrases() {
         phrases.clear();
     }
 }

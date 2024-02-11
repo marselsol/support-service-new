@@ -1,6 +1,7 @@
 package com.example.servlets;
 
 import com.example.repository.PhraseStorage;
+import com.example.utils.beans.factory.BeanFactoryMarsel;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,14 +27,22 @@ class HelpServletTest {
 
     private HelpServlet servlet;
     private StringWriter responseWriter;
+    private PhraseStorage phraseStorage;
+
 
     @BeforeEach
     void setUp() throws Exception {
+        BeanFactoryMarsel beanFactory = new BeanFactoryMarsel();
+        beanFactory.fillSingletonsMap("com.example");
+        beanFactory.fillAutowired();
+
         MockitoAnnotations.initMocks(this);
         servlet = new HelpServlet();
+        phraseStorage = new PhraseStorage();
+        servlet.setPhraseStorage(new PhraseStorage());
         responseWriter = new StringWriter();
         when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
-        PhraseStorage.clearPhrases();
+        phraseStorage.clearPhrases();
     }
 
     @Test
@@ -44,7 +53,7 @@ class HelpServletTest {
 
     @Test
     void doGetWithPhrases() throws Exception {
-        PhraseStorage.addPhrase("Test phrase");
+        phraseStorage.addPhrase("Test phrase");
         servlet.doGet(request, response);
         assertTrue(responseWriter.toString().contains("Test phrase"));
     }

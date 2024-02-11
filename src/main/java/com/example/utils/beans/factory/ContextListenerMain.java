@@ -10,6 +10,7 @@ public class ContextListenerMain implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         System.out.println("contextInitialized is running.");
         BeanFactoryMarsel beanFactory = new BeanFactoryMarsel();
-        beanFactory.instantiate("com.example");
+        beanFactory.fillSingletonsMap("com.example");
+        beanFactory.fillAutowired();
     }
 }
