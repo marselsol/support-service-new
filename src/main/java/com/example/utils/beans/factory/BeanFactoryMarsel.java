@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
+@ComponentMarsel
 public class BeanFactoryMarsel {
     Map<String, Object> singletonsMap = new HashMap<>();
 
@@ -28,31 +29,52 @@ public class BeanFactoryMarsel {
         }
     }
 
+//    public void fillAutowired() {
+//        System.out.println("==fillAutowired==");
+//        for (Object object : singletonsMap.values()) {
+//            for (Field field : object.getClass().getDeclaredFields()) {
+//                if (field.isAnnotationPresent(AutowiredMarsel.class)) {
+//                    for (Object dependency : singletonsMap.values()) {
+//                        if (dependency.getClass().equals(field.getType())) {
+//                            String setterName = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);//setPromotionsService
+//                            System.out.println("Setter name = " + setterName);
+//                            Method setter = null;
+//                            try {
+//                                setter = object.getClass().getMethod(setterName, dependency.getClass());
+//                            } catch (NoSuchMethodException e) {
+//                                throw new RuntimeException(e);
+//                            }
+//                            try {
+//                                setter.invoke(object, dependency);
+//                            } catch (IllegalAccessException | InvocationTargetException e) {
+//                                throw new RuntimeException(e);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        getInfoAboutSingletonsMap("fillAutowired");
+//    }
+
     public void fillAutowired() {
         System.out.println("==fillAutowired==");
-        for (Object object : singletonsMap.values()) {
-            for (Field field : object.getClass().getDeclaredFields()) {
-                if (field.isAnnotationPresent(AutowiredMarsel.class)) {
-                    for (Object dependency : singletonsMap.values()) {
-                        if (dependency.getClass().equals(field.getType())) {
-                            String setterName = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);//setPromotionsService
-                            System.out.println("Setter name = " + setterName);
-                            Method setter = null;
-                            try {
-                                setter = object.getClass().getMethod(setterName, dependency.getClass());
-                            } catch (NoSuchMethodException e) {
-                                throw new RuntimeException(e);
-                            }
-                            try {
-                                setter.invoke(object, dependency);
-                            } catch (IllegalAccessException | InvocationTargetException e) {
-                                throw new RuntimeException(e);
-                            }
+        singletonsMap.values().forEach(object -> {
+            Arrays.stream(object.getClass().getDeclaredFields())
+                    .filter(field -> field.isAnnotationPresent(AutowiredMarsel.class))
+                    .forEach(field -> {
+                        Object dependency = singletonsMap.values().stream()
+                                .filter(dep -> field.getType().isAssignableFrom(dep.getClass()))
+                                .findFirst()
+                                .orElseThrow(() -> new RuntimeException("No suitable bean found for injection"));
+                        field.setAccessible(true);
+                        try {
+                            field.set(object, dependency);
+                        } catch (IllegalAccessException e) {
+                            throw new RuntimeException("Could not inject dependency", e);
                         }
-                    }
-                }
-            }
-        }
+                    });
+        });
         getInfoAboutSingletonsMap("fillAutowired");
     }
 
@@ -72,8 +94,6 @@ public class BeanFactoryMarsel {
             throw new RuntimeException(e);
         }
         System.err.println("Size singletons map is: " + singletonsMap.size());
-        System.out.println(singletonsMap.get("phraseStorage"));
-        System.out.println(singletonsMap.get("helpServlet"));
     }
 
     private void processDirectory(File directory, String packageName) {
