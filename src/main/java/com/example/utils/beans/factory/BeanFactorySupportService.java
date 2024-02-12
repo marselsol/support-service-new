@@ -2,6 +2,7 @@ package com.example.utils.beans.factory;
 
 import com.example.utils.beans.factory.annotation.AutowiredSupportService;
 import com.example.utils.beans.factory.stereotype.ComponentSupportService;
+import com.example.utils.beans.factory.stereotype.ControllerSupportServiceAnnotation;
 import com.example.utils.beans.factory.stereotype.RepositorySupportService;
 
 import java.io.File;
@@ -77,7 +78,9 @@ public class BeanFactorySupportService {
                      * используем чтобы достать класс с помощью classLoader по имени и полному пути
                      */
                     Class<?> classObject = Class.forName(packageName + "." + className);
-                    if (classObject.isAnnotationPresent(ComponentSupportService.class) || classObject.isAnnotationPresent(RepositorySupportService.class)) {
+                    if (classObject.isAnnotationPresent(ComponentSupportService.class)
+                            || classObject.isAnnotationPresent(RepositorySupportService.class)
+                            || classObject.isAnnotationPresent(ControllerSupportServiceAnnotation.class)) {
                         System.out.println("Component: " + classObject);
                         Object instance = classObject.newInstance();
                         String beanName = className.substring(0, 1).toLowerCase() + className.substring(1);

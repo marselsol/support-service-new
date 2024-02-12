@@ -1,37 +1,34 @@
-package com.example.servlets;
+package com.example.controllers;
 
 import com.example.repository.PhraseStorage;
-import com.example.utils.beans.factory.BeanFactorySupportService;
 import com.example.utils.beans.factory.annotation.AutowiredSupportService;
-import com.example.utils.beans.factory.stereotype.ComponentSupportService;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
+import com.example.utils.beans.factory.stereotype.ControllerSupportServiceAnnotation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-@ComponentSupportService
-public class HelpServlet extends HttpServlet {
+@ControllerSupportServiceAnnotation
+public class HelpController implements ControllerSupportService {
 
     @AutowiredSupportService
-    PhraseStorage phraseStorage;
+    private PhraseStorage phraseStorage;
 
     public void setPhraseStorage(PhraseStorage phraseStorage) {
         this.phraseStorage = phraseStorage;
     }
 
     @Override
-    public void init() throws ServletException {
-        BeanFactorySupportService beanFactorySupportService = new BeanFactorySupportService();
-        beanFactorySupportService.fillSingletonsMap("com.example");
-        beanFactorySupportService.fillAutowired();
-        this.phraseStorage = (PhraseStorage) beanFactorySupportService.getBeans("phraseStorage");
+    public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if ("GET".equalsIgnoreCase(request.getMethod())) {
+            doGet(request, response);
+        } else if ("POST".equalsIgnoreCase(request.getMethod())) {
+            doPost(request, response);
+        }
     }
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("text/plain");
         try {
             resp.getWriter().println(phraseStorage.getRandomPhrase());
@@ -40,8 +37,7 @@ public class HelpServlet extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String phrase = req.getReader().readLine();
         if (phrase == null || phrase.trim().isEmpty()) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Phrase is empty!");
