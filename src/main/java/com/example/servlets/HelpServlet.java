@@ -1,9 +1,9 @@
 package com.example.servlets;
 
 import com.example.repository.PhraseStorage;
-import com.example.utils.beans.factory.BeanFactoryMarsel;
-import com.example.utils.beans.factory.annotation.AutowiredMarsel;
-import com.example.utils.beans.factory.stereotype.ComponentMarsel;
+import com.example.utils.beans.factory.BeanFactorySupportService;
+import com.example.utils.beans.factory.annotation.AutowiredSupportService;
+import com.example.utils.beans.factory.stereotype.ComponentSupportService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,10 +12,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-@ComponentMarsel
+@ComponentSupportService
 public class HelpServlet extends HttpServlet {
 
-    @AutowiredMarsel
+    @AutowiredSupportService
     PhraseStorage phraseStorage;
 
     public void setPhraseStorage(PhraseStorage phraseStorage) {
@@ -24,10 +24,10 @@ public class HelpServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        BeanFactoryMarsel beanFactoryMarsel = new BeanFactoryMarsel();
-        beanFactoryMarsel.fillSingletonsMap("com.example");
-        beanFactoryMarsel.fillAutowired();
-        this.phraseStorage = (PhraseStorage) beanFactoryMarsel.getBeans("phraseStorage");
+        BeanFactorySupportService beanFactorySupportService = new BeanFactorySupportService();
+        beanFactorySupportService.fillSingletonsMap("com.example");
+        beanFactorySupportService.fillAutowired();
+        this.phraseStorage = (PhraseStorage) beanFactorySupportService.getBeans("phraseStorage");
     }
 
     @Override
@@ -47,9 +47,6 @@ public class HelpServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Phrase is empty!");
             return;
         }
-        BeanFactoryMarsel beanFactoryMarsel = new BeanFactoryMarsel();
-        beanFactoryMarsel.getInfoAboutSingletonsMap("doPost");
-        System.out.println("Проверка существования phraseStorage: " + this.phraseStorage);
         phraseStorage.addPhrase(phrase);
         resp.setContentType("text/plain");
         resp.setStatus(HttpServletResponse.SC_CREATED);

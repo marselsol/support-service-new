@@ -1,7 +1,7 @@
 package com.example.servlets;
 
 import com.example.repository.PhraseStorage;
-import com.example.utils.beans.factory.BeanFactoryMarsel;
+import com.example.utils.beans.factory.BeanFactorySupportService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +32,7 @@ class HelpServletTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        BeanFactoryMarsel beanFactory = new BeanFactoryMarsel();
+        BeanFactorySupportService beanFactory = new BeanFactorySupportService();
         beanFactory.fillSingletonsMap("com.example");
         beanFactory.fillAutowired();
 

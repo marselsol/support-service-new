@@ -1,7 +1,7 @@
 package com.example.repository;
 
 import com.example.servlets.HelpServlet;
-import com.example.utils.beans.factory.BeanFactoryMarsel;
+import com.example.utils.beans.factory.BeanFactorySupportService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +13,7 @@ public class PhraseStorageTest {
 
     @BeforeEach
     void setUp() {
-        BeanFactoryMarsel beanFactory = new BeanFactoryMarsel();
+        BeanFactorySupportService beanFactory = new BeanFactorySupportService();
         beanFactory.fillSingletonsMap("com.example");
         beanFactory.fillAutowired();
 

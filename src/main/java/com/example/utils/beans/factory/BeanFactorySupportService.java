@@ -1,8 +1,8 @@
 package com.example.utils.beans.factory;
 
-import com.example.utils.beans.factory.annotation.AutowiredMarsel;
-import com.example.utils.beans.factory.stereotype.ComponentMarsel;
-import com.example.utils.beans.factory.stereotype.RepositoryMarsel;
+import com.example.utils.beans.factory.annotation.AutowiredSupportService;
+import com.example.utils.beans.factory.stereotype.ComponentSupportService;
+import com.example.utils.beans.factory.stereotype.RepositorySupportService;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,27 +13,19 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
-@ComponentMarsel
-public class BeanFactoryMarsel {
+@ComponentSupportService
+public class BeanFactorySupportService {
     Map<String, Object> singletonsMap = new HashMap<>();
 
     public Object getBeans(String beanName) {
         return singletonsMap.get(beanName);
     }
 
-    public void getInfoAboutSingletonsMap(String text) {
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!in singletonsMap. size is: " + singletonsMap.size());
-        System.out.println("В методе " + text);
-        for (Map.Entry<String, Object> entry : singletonsMap.entrySet()) {
-            System.out.println("Что лежит в singletonsMap: " + entry.getKey() + ": " + entry.getValue());
-        }
-    }
-
     public void fillAutowired() {
         System.out.println("==fillAutowired==");
         for (Object object : singletonsMap.values()) {
             for (Field field : object.getClass().getDeclaredFields()) {
-                if (field.isAnnotationPresent(AutowiredMarsel.class)) {
+                if (field.isAnnotationPresent(AutowiredSupportService.class)) {
                     for (Object dependency : singletonsMap.values()) {
                         if (dependency.getClass().equals(field.getType())) {
                             String setterName = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);//setPromotionsService
@@ -54,7 +46,6 @@ public class BeanFactoryMarsel {
                 }
             }
         }
-        getInfoAboutSingletonsMap("fillAutowired");
     }
 
     public void fillSingletonsMap(String basePackage) {
@@ -68,7 +59,6 @@ public class BeanFactoryMarsel {
                 File file = new File(resource.toURI());
                 processDirectory(file, basePackage);
             }
-            getInfoAboutSingletonsMap("fillSingletonsMap");
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -87,7 +77,7 @@ public class BeanFactoryMarsel {
                      * используем чтобы достать класс с помощью classLoader по имени и полному пути
                      */
                     Class<?> classObject = Class.forName(packageName + "." + className);
-                    if (classObject.isAnnotationPresent(ComponentMarsel.class) || classObject.isAnnotationPresent(RepositoryMarsel.class)) {
+                    if (classObject.isAnnotationPresent(ComponentSupportService.class) || classObject.isAnnotationPresent(RepositorySupportService.class)) {
                         System.out.println("Component: " + classObject);
                         Object instance = classObject.newInstance();
                         String beanName = className.substring(0, 1).toLowerCase() + className.substring(1);
