@@ -1,6 +1,5 @@
 package com.example.repository;
 
-import com.example.utils.beans.factory.stereotype.ComponentMarsel;
 import com.example.utils.beans.factory.stereotype.RepositoryMarsel;
 import lombok.extern.slf4j.Slf4j;
 
@@ -9,14 +8,13 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-@Slf4j
 @RepositoryMarsel
 public class PhraseStorage {
     private static final List<String> phrases = new CopyOnWriteArrayList<>();
 
     public void addPhrase(String phrase) {
         phrases.add(phrase);
-        log.info("New phrase added: {}", phrase);
+        System.out.printf("New phrase added: {}", phrase);
     }
 
     public String getRandomPhrase() throws NoSuchElementException {
@@ -24,7 +22,7 @@ public class PhraseStorage {
             throw new NoSuchElementException();
         }
         String phrase = phrases.get(new Random().nextInt(phrases.size()));
-        log.info("Output of the requested phrase: {}", phrase);
+        System.out.printf("Output of the requested phrase: {}", phrase);
         return phrase;
     }
 
