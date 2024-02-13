@@ -21,6 +21,7 @@ public class DispatcherServletSupportService extends HttpServlet {
         BeanFactorySupportService beanFactory = new BeanFactorySupportService();
         beanFactory.fillSingletonsMap("com.example");
         beanFactory.fillAutowired();
+        beanFactory.wrapControllersWithLoggingProxy();
         Object helpController = beanFactory.getBeans("helpController");
         controllers.put("/help-service/v1/support", helpController);
     }

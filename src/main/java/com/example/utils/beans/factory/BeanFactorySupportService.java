@@ -1,5 +1,8 @@
 package com.example.utils.beans.factory;
 
+import com.example.controllers.ControllerSupportService;
+import com.example.logging.ConsoleLoggerService;
+import com.example.logging.LoggerService;
 import com.example.utils.beans.factory.annotation.AutowiredSupportService;
 import com.example.utils.beans.factory.stereotype.ComponentSupportService;
 import com.example.utils.beans.factory.stereotype.ControllerSupportServiceAnnotation;
@@ -92,5 +95,15 @@ public class BeanFactorySupportService {
                 }
             }
         }
+    }
+
+    public void wrapControllersWithLoggingProxy() {
+        LoggerService logger = new ConsoleLoggerService();
+        singletonsMap.forEach((beanName, beanInstance) -> {
+            if (beanInstance instanceof ControllerSupportService) {
+                Object proxyInstance = ProxyFactory.createProxy(beanInstance, logger);
+                singletonsMap.put(beanName, proxyInstance);
+            }
+        });
     }
 }

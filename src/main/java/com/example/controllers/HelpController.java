@@ -1,8 +1,11 @@
 package com.example.controllers;
 
+import com.example.dto.PhraseInput;
+import com.example.dto.PhraseOutput;
 import com.example.repository.PhraseStorage;
 import com.example.utils.beans.factory.annotation.AutowiredSupportService;
 import com.example.utils.beans.factory.stereotype.ControllerSupportServiceAnnotation;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -14,6 +17,7 @@ public class HelpController implements ControllerSupportService {
 
     @AutowiredSupportService
     private PhraseStorage phraseStorage;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void setPhraseStorage(PhraseStorage phraseStorage) {
         this.phraseStorage = phraseStorage;
@@ -29,23 +33,25 @@ public class HelpController implements ControllerSupportService {
     }
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("text/plain");
+        resp.setContentType("application/json");
         try {
-            resp.getWriter().println(phraseStorage.getRandomPhrase());
+            PhraseOutput phraseResponse = new PhraseOutput(phraseStorage.getRandomPhrase());
+            resp.getWriter().write(objectMapper.writeValueAsString(phraseResponse));
         } catch (NoSuchElementException e) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "No phrases available.");
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "{\"error\":\"No phrases available.\"}");
         }
     }
 
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String phrase = req.getReader().readLine();
+        PhraseInput input = objectMapper.readValue(req.getInputStream(), PhraseInput.class);
+        String phrase = input.getPhrase();
         if (phrase == null || phrase.trim().isEmpty()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Phrase is empty!");
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Phrase is empty!\"}");
             return;
         }
         phraseStorage.addPhrase(phrase);
-        resp.setContentType("text/plain");
+        resp.setContentType("application/json");
         resp.setStatus(HttpServletResponse.SC_CREATED);
-        resp.getWriter().println("The phrase has been added to the collection!");
+        resp.getWriter().println("{\"message\":\"The phrase has been added to the collection!\"}");
     }
 }
