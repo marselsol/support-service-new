@@ -7,6 +7,7 @@ import com.example.utils.beans.factory.annotation.AutowiredSupportService;
 import com.example.utils.beans.factory.stereotype.ComponentSupportService;
 import com.example.utils.beans.factory.stereotype.ControllerSupportServiceAnnotation;
 import com.example.utils.beans.factory.stereotype.RepositorySupportService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,29 +28,35 @@ public class BeanFactorySupportService {
 
     public void fillAutowired() {
         System.out.println("==fillAutowired==");
-        for (Object object : singletonsMap.values()) {
-            for (Field field : object.getClass().getDeclaredFields()) {
-                if (field.isAnnotationPresent(AutowiredSupportService.class)) {
-                    for (Object dependency : singletonsMap.values()) {
-                        if (dependency.getClass().equals(field.getType())) {
-                            String setterName = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);//setPromotionsService
-                            System.out.println("Setter name = " + setterName);
-                            Method setter = null;
-                            try {
-                                setter = object.getClass().getMethod(setterName, dependency.getClass());
-                            } catch (NoSuchMethodException e) {
-                                throw new RuntimeException(e);
-                            }
-                            try {
-                                setter.invoke(object, dependency);
-                            } catch (IllegalAccessException | InvocationTargetException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    }
-                }
-            }
+        singletonsMap.values().forEach(this::searchAndInjectAutowiredDependenciesInSingletonsMap);
+    }
+
+    private void searchAndInjectAutowiredDependenciesInSingletonsMap(Object object) {
+        Arrays.stream(object.getClass().getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(AutowiredSupportService.class))
+                .forEach(field -> injectDependency(object, field));
+    }
+
+    private void injectDependency(Object object, Field field) {
+        singletonsMap.values().stream()
+                .filter(dependency -> dependency.getClass().equals(field.getType()))
+                .findFirst()
+                .ifPresent(dependency -> invokeSetterMethod(object, field, dependency));
+    }
+
+    private void invokeSetterMethod(Object object, Field field, Object dependency) {
+        String setterName = "set" + capitalizeFirstLetter(field.getName());
+        System.out.println("Setter name = " + setterName);
+        try {
+            Method setter = object.getClass().getMethod(setterName, dependency.getClass());
+            setter.invoke(object, dependency);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    private String capitalizeFirstLetter(String name) {
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
     public void fillSingletonsMap(String basePackage) {
@@ -63,6 +70,7 @@ public class BeanFactorySupportService {
                 File file = new File(resource.toURI());
                 processDirectory(file, basePackage);
             }
+            singletonsMap.put("objectMapper", returnObjectMapper());
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -105,5 +113,9 @@ public class BeanFactorySupportService {
                 singletonsMap.put(beanName, proxyInstance);
             }
         });
+    }
+
+    public ObjectMapper returnObjectMapper() {
+        return new ObjectMapper();
     }
 }
