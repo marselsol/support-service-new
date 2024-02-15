@@ -17,10 +17,15 @@ public class HelpController implements ControllerSupportService {
 
     @AutowiredSupportService
     private PhraseStorage phraseStorage;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @AutowiredSupportService
+    private ObjectMapper objectMapper;
 
     public void setPhraseStorage(PhraseStorage phraseStorage) {
         this.phraseStorage = phraseStorage;
+    }
+
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 
     @Override
