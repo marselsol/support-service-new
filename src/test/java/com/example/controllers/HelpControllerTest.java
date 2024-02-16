@@ -2,16 +2,15 @@ package com.example.controllers;
 
 import com.example.repository.PhraseStorage;
 import com.example.utils.beans.factory.BeanFactorySupportService;
-import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.stubbing.OngoingStubbing;
 
-import java.io.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
@@ -60,6 +59,4 @@ class HelpControllerTest {
         controller.handleRequest(request, response);
         assertTrue(responseWriter.toString().contains("Test phrase"));
     }
-
-    //Тесты для POST
 }
