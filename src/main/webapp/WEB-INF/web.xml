@@ -6,12 +6,12 @@
     <display-name>Archetype Created Web Application</display-name>
 
     <servlet>
-        <servlet-name>SupportServlet</servlet-name>
-        <servlet-class>com.example.servlets.HelpServlet</servlet-class>
+        <servlet-name>DispatcherServlet</servlet-name>
+        <servlet-class>com.example.servlets.DispatcherServletSupportService</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>SupportServlet</servlet-name>
-        <url-pattern>/help-service/v1/support</url-pattern>
+        <servlet-name>DispatcherServlet</servlet-name>
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
 </web-app>

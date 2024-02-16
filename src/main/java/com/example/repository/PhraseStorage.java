@@ -1,31 +1,31 @@
 package com.example.repository;
 
-import lombok.extern.slf4j.Slf4j;
+import com.example.utils.beans.factory.stereotype.RepositorySupportService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-@Slf4j
+@RepositorySupportService
 public class PhraseStorage {
     private static final List<String> phrases = new CopyOnWriteArrayList<>();
 
-    public static void addPhrase(String phrase) {
+    public void addPhrase(String phrase) {
         phrases.add(phrase);
-        log.info("New phrase added: {}", phrase);
+        System.out.printf("New phrase added: %s\n", phrase);
     }
 
-    public static String getRandomPhrase() throws NoSuchElementException {
+    public String getRandomPhrase() throws NoSuchElementException {
         if (phrases.isEmpty()) {
             throw new NoSuchElementException();
         }
         String phrase = phrases.get(new Random().nextInt(phrases.size()));
-        log.info("Output of the requested phrase: {}", phrase);
+        System.out.printf("Output of the requested phrase: %s\n", phrase);
         return phrase;
     }
 
-    public static void clearPhrases() {
+    public void clearPhrases() {
         phrases.clear();
     }
 }
