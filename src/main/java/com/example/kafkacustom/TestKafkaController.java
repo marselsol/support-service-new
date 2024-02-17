@@ -22,7 +22,7 @@ public class TestKafkaController {
 
     @PostMapping
     public void addMessage(@RequestBody String phrase) {
-        messageBroker.sendMessage("test", phrase);
+        messageBroker.sendMessage("addPhrases", phrase);
     }
 }
 
