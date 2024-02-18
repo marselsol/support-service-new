@@ -2,6 +2,7 @@ package com.example.repository;
 
 import com.example.dto.PhraseOutput;
 import lombok.extern.slf4j.Slf4j;
+import org.example.inmemorybroker.KafkaListenerCustom;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,6 +15,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Repository
 public class PhraseStorage {
     private static final List<String> phrases = new CopyOnWriteArrayList<>();
+
+    @KafkaListenerCustom(topicName = "addPhrases")
+    public void addPhrasesMethodListener(String message) {
+        addPhrase(message);
+        log.info("Read the message and added it to phraseStorage: {}", message);
+    }
 
     public PhraseOutput addPhrase(String phrase) {
         if (phrase == null || phrase.trim().isEmpty()) {

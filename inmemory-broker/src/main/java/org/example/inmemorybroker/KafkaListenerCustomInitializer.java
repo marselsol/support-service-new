@@ -1,10 +1,7 @@
-package com.example.kafkacustom;
+package org.example.inmemorybroker;
 
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -16,13 +13,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @EnableScheduling
-@RequiredArgsConstructor
 public class KafkaListenerCustomInitializer {
 
-    private final MessageBroker messageBroker;
+    private final DefaultMessageBroker defaultMessageBroker;
+
     private final ApplicationContext context;
 
     private final Map<String, Map<Object, Method>> registeredListeners = new ConcurrentHashMap<>();
+
+    public KafkaListenerCustomInitializer(DefaultMessageBroker defaultMessageBroker, ApplicationContext context) {
+        this.defaultMessageBroker = defaultMessageBroker;
+        this.context = context;
+    }
 
     @PostConstruct
     public void init() {
@@ -42,10 +44,10 @@ public class KafkaListenerCustomInitializer {
         }
     }
 
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedRate = 500)
     public void pollMessages() {
         registeredListeners.forEach((topicName, listeners) -> {
-            List<String> messages = messageBroker.consumeMessage(topicName);
+            List<String> messages = defaultMessageBroker.consumeMessage(topicName);
             if (!messages.isEmpty()) {
                 listeners.forEach((bean, method) -> invokeListenerMethod(bean, method, messages));
             }

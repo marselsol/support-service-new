@@ -1,4 +1,4 @@
-package com.example.kafkacustom;
+package org.example.inmemorybroker;
 
 import org.springframework.stereotype.Service;
 
@@ -8,16 +8,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
-public class MessageBroker {
-    //<Название очереди, очередь>
+public class DefaultMessageBroker implements MessageBroker {
     private final ConcurrentHashMap<String, CopyOnWriteArrayList<String>> topics = new ConcurrentHashMap<>();
-    //<topicName, Consumer>
     private final ConcurrentHashMap<String, ConsumerKafkaCustom> consumersKafkaCustom = new ConcurrentHashMap<>();
 
+    @Override
     public void createTopic(String topicName) {
         topics.put(topicName, new CopyOnWriteArrayList<>());
     }
 
+    @Override
     public void sendMessage(String topicName, String message) {
         if (!topics.containsKey(topicName)) {
             createTopic(topicName);
@@ -25,6 +25,7 @@ public class MessageBroker {
         topics.get(topicName).add(message);
     }
 
+    @Override
     public List<String> consumeMessage(String topicName) {
         if (!consumersKafkaCustom.containsKey(topicName)) {
             consumersKafkaCustom.put(topicName, new ConsumerKafkaCustom());

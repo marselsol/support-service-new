@@ -1,4 +1,4 @@
-package com.example.kafkacustom;
+package org.example.inmemorybroker;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -3,6 +3,7 @@ package com.example.controllers;
 import com.example.dto.PhraseInput;
 import com.example.dto.PhraseOutput;
 import com.example.repository.PhraseStorage;
+import com.example.utils.KafkaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class HelpController {
 
     private final PhraseStorage phraseStorage;
+    private final KafkaService kafkaService;
 
     @GetMapping
     public ResponseEntity<PhraseOutput> returnRandomPhrase() {
@@ -21,7 +23,7 @@ public class HelpController {
 
     @PostMapping
     public ResponseEntity<PhraseOutput> savePhrase(@RequestBody PhraseInput phraseInput) {
-        return ResponseEntity.ok(phraseStorage.addPhrase(phraseInput.phrase()));
+        return ResponseEntity.ok(kafkaService.savePhrase("addPhrases", phraseInput.phrase()));
     }
 
     @DeleteMapping
