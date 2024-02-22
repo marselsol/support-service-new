@@ -31,6 +31,8 @@ public class KafkaListenerCustomInitializer {
         discoverListeners();
     }
 
+
+
     private void discoverListeners() {
         String[] beanNames = context.getBeanDefinitionNames();
         for (String beanName : beanNames) {

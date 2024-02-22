@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class KafkaService {
+public class MessageBrokerKafService {
     private final MessageBroker messageBroker;
 
     public PhraseOutput savePhrase(String topicName, String message) {
