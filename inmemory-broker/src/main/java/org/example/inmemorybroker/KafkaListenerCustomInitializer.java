@@ -1,7 +1,5 @@
 package org.example.inmemorybroker;
 
-import jakarta.annotation.PostConstruct;
-import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -17,33 +15,10 @@ public class KafkaListenerCustomInitializer {
 
     private final DefaultMessageBroker defaultMessageBroker;
 
-    private final ApplicationContext context;
-
     private final Map<String, Map<Object, Method>> registeredListeners = new ConcurrentHashMap<>();
 
-    public KafkaListenerCustomInitializer(DefaultMessageBroker defaultMessageBroker, ApplicationContext context) {
+    public KafkaListenerCustomInitializer(DefaultMessageBroker defaultMessageBroker) {
         this.defaultMessageBroker = defaultMessageBroker;
-        this.context = context;
-    }
-
-    @PostConstruct
-    public void init() {
-        discoverListeners();
-    }
-
-
-
-    private void discoverListeners() {
-        String[] beanNames = context.getBeanDefinitionNames();
-        for (String beanName : beanNames) {
-            Object bean = context.getBean(beanName);
-            for (Method method : bean.getClass().getDeclaredMethods()) {
-                if (method.isAnnotationPresent(KafkaListenerCustom.class)) {
-                    KafkaListenerCustom annotation = method.getAnnotation(KafkaListenerCustom.class);
-                    registeredListeners.computeIfAbsent(annotation.topicName(), k -> new ConcurrentHashMap<>()).put(bean, method);
-                }
-            }
-        }
     }
 
     @Scheduled(fixedRate = 500)
@@ -65,5 +40,9 @@ public class KafkaListenerCustomInitializer {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void registerListener(String topicName, Object bean, Method method) {
+        registeredListeners.computeIfAbsent(topicName, k -> new ConcurrentHashMap<>()).put(bean, method);
     }
 }
