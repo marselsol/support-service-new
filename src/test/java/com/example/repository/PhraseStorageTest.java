@@ -2,6 +2,7 @@ package com.example.repository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.NoSuchElementException;
 
@@ -19,7 +20,7 @@ public class PhraseStorageTest {
     @Test
     void testAddAndGetPhrase() {
         phraseStorage.addPhrase("Test phrase!");
-        String phrase = phraseStorage.getRandomPhrase();
+        String phrase = phraseStorage.getRandomPhrase().phrase();
         assertNotNull(phrase);
         assertEquals("Test phrase!", phrase);
     }
@@ -29,8 +30,8 @@ public class PhraseStorageTest {
         phraseStorage.addPhrase("Test phrase");
         phraseStorage.clearPhrases();
 
-        assertThrows(NoSuchElementException.class, () -> {
+        assertThrows(ResponseStatusException.class, () -> {
             phraseStorage.getRandomPhrase();
-        }, "Should throw NoSuchElementException if storage was cleared and is now empty");
+        }, "Should throw ResponseStatusException if storage was cleared and is now empty");
     }
 }

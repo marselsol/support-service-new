@@ -1,28 +1,45 @@
 package com.example.repository;
 
-import com.example.utils.beans.factory.stereotype.RepositorySupportService;
+import com.example.dto.PhraseOutput;
+import lombok.extern.slf4j.Slf4j;
+import org.example.inmemorybroker.KafkaListenerCustom;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Repository;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-@RepositorySupportService
+@Slf4j
+@Repository
 public class PhraseStorage {
     private static final List<String> phrases = new CopyOnWriteArrayList<>();
 
-    public void addPhrase(String phrase) {
-        phrases.add(phrase);
-        System.out.printf("New phrase added: %s\n", phrase);
+    @KafkaListenerCustom(topicName = "addPhrases")
+    public void addPhrasesMethodListener(String message) {
+        addPhrase(message);
+        log.info("Read the message and added it to phraseStorage: {}", message);
     }
 
-    public String getRandomPhrase() throws NoSuchElementException {
+    public PhraseOutput addPhrase(String phrase) {
+        if (phrase == null || phrase.trim().isEmpty()) {
+            log.error("Attempted to add an empty phrase.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Input phrase is empty!");
+        }
+        phrases.add(phrase);
+        log.info("New phrase added: {}", phrase);
+        return new PhraseOutput(phrase);
+    }
+
+    public PhraseOutput getRandomPhrase() {
         if (phrases.isEmpty()) {
-            throw new NoSuchElementException();
+            log.error("No phrases available to return.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No phrases found");
         }
         String phrase = phrases.get(new Random().nextInt(phrases.size()));
-        System.out.printf("Output of the requested phrase: %s\n", phrase);
-        return phrase;
+        log.info("Output of the requested phrase: {}", phrase);
+        return new PhraseOutput(phrase);
     }
 
     public void clearPhrases() {
