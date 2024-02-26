@@ -2,20 +2,23 @@ package com.example.controllers;
 
 import com.example.dto.PhraseInput;
 import com.example.dto.PhraseOutput;
-import com.example.repository.PhraseStorage;
-import com.example.utils.MessageBrokerKafService;
-import lombok.RequiredArgsConstructor;
+import com.example.repository.PhraseStorageImpl;
+import com.example.services.KafkaServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
+
 @RestController
 @RequestMapping("/help-service/v1/support")
 public class HelpController {
 
-    private final PhraseStorage phraseStorage;
-    private final MessageBrokerKafService messageBrokerKafService;
+    @Autowired
+    private PhraseStorageImpl phraseStorage;
+    @Autowired(required = false)
+    private KafkaServiceImpl kafkaService;
+
 
     @GetMapping
     public ResponseEntity<PhraseOutput> returnRandomPhrase() {
@@ -24,7 +27,7 @@ public class HelpController {
 
     @PostMapping
     public ResponseEntity<PhraseOutput> savePhrase(@RequestBody PhraseInput phraseInput) {
-        PhraseOutput savedPhrase = messageBrokerKafService.savePhrase("addPhrases", phraseInput.phrase());
+        PhraseOutput savedPhrase = kafkaService.saveInputPhrase("addPhrases", phraseInput);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedPhrase);
     }
 
