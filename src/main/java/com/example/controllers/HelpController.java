@@ -2,35 +2,39 @@ package com.example.controllers;
 
 import com.example.dto.PhraseInput;
 import com.example.dto.PhraseOutput;
-import com.example.repository.PhraseStorage;
-import com.example.utils.MessageBrokerKafService;
+import com.example.services.PhraseServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
+@Slf4j
 @RestController
 @RequestMapping("/help-service/v1/support")
+@RequiredArgsConstructor
 public class HelpController {
 
-    private final PhraseStorage phraseStorage;
-    private final MessageBrokerKafService messageBrokerKafService;
+    private final PhraseServiceImpl phraseService;
 
     @GetMapping
-    public ResponseEntity<PhraseOutput> returnRandomPhrase() {
-        return ResponseEntity.ok(phraseStorage.getRandomPhrase());
+    public PhraseOutput returnRandomPhrase() {
+        PhraseOutput phraseOutput = phraseService.getRandomPhrase();
+        log.info("Random phrase retrieved successfully.");
+        return phraseOutput;
     }
 
     @PostMapping
-    public ResponseEntity<PhraseOutput> savePhrase(@RequestBody PhraseInput phraseInput) {
-        PhraseOutput savedPhrase = messageBrokerKafService.savePhrase("addPhrases", phraseInput.phrase());
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedPhrase);
+    @ResponseStatus(HttpStatus.CREATED)
+    public PhraseOutput savePhrase(@RequestBody PhraseInput phraseInput) {
+        PhraseOutput savedPhrase = phraseService.saveInputPhrase(phraseInput);
+        log.info("Phrase saved successfully: {}", savedPhrase.phrase());
+        return savedPhrase;
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> clearPhrases() {
-        phraseStorage.clearPhrases();
-        return ResponseEntity.noContent().build();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void clearPhrases() {
+        phraseService.clearPhrases();
+        log.info("All phrases cleared successfully.");
     }
 }
