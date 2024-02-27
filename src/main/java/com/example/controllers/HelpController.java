@@ -6,7 +6,6 @@ import com.example.services.PhraseServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -18,23 +17,24 @@ public class HelpController {
     private final PhraseServiceImpl phraseService;
 
     @GetMapping
-    public ResponseEntity<PhraseOutput> returnRandomPhrase() {
+    public PhraseOutput returnRandomPhrase() {
         PhraseOutput phraseOutput = phraseService.getRandomPhrase();
         log.info("Random phrase retrieved successfully.");
-        return ResponseEntity.ok(phraseOutput);
+        return phraseOutput;
     }
 
     @PostMapping
-    public ResponseEntity<PhraseOutput> savePhrase(@RequestBody PhraseInput phraseInput) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public PhraseOutput savePhrase(@RequestBody PhraseInput phraseInput) {
         PhraseOutput savedPhrase = phraseService.saveInputPhrase(phraseInput);
         log.info("Phrase saved successfully: {}", savedPhrase.phrase());
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedPhrase);
+        return savedPhrase;
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> clearPhrases() {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void clearPhrases() {
         phraseService.clearPhrases();
         log.info("All phrases cleared successfully.");
-        return ResponseEntity.noContent().build();
     }
 }
