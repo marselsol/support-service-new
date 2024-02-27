@@ -1,7 +1,7 @@
 package com.example.controllers;
 
 import com.example.dto.PhraseInput;
-import com.example.services.KafkaServiceImpl;
+import com.example.services.PhraseKafkaManagerImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,7 +23,7 @@ class HelpControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private KafkaServiceImpl kafkaServiceImpl;
+    private PhraseKafkaManagerImpl kafkaServiceImpl;
 
     @Test
     void returnRandomPhrase_Success() throws Exception {

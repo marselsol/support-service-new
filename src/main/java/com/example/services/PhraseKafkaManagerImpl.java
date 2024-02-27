@@ -10,17 +10,19 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "features.kafka-sync", havingValue = "true")
-public class KafkaServiceImpl implements KafkaService {
+public class PhraseKafkaManagerImpl implements PhraseKafkaManager {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final PhraseStorageImpl phraseStorage;
 
     public PhraseOutput saveInputPhrase(String topicName, PhraseInput message) {
-        kafkaTemplate.send(topicName, message);
+        kafkaTemplate.send(topicName, UUID.randomUUID().toString(), message);
         return new PhraseOutput(message.phrase());
     }
 

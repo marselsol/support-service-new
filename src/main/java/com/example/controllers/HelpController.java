@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @RestController
@@ -16,44 +15,26 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class HelpController {
 
-    private final PhraseServiceImpl phraseServiceImpl;
+    private final PhraseServiceImpl phraseService;
 
     @GetMapping
     public ResponseEntity<PhraseOutput> returnRandomPhrase() {
-        try {
-            PhraseOutput phraseOutput = phraseServiceImpl.getRandomPhrase();
-            log.info("Random phrase retrieved successfully.");
-            return ResponseEntity.ok(phraseOutput);
-        } catch (ResponseStatusException e) {
-            log.error("Error retrieving random phrase: {}", e.getReason());
-            throw e;
-        }
+        PhraseOutput phraseOutput = phraseService.getRandomPhrase();
+        log.info("Random phrase retrieved successfully.");
+        return ResponseEntity.ok(phraseOutput);
     }
 
     @PostMapping
     public ResponseEntity<PhraseOutput> savePhrase(@RequestBody PhraseInput phraseInput) {
-        try {
-            PhraseOutput savedPhrase = phraseServiceImpl.saveInputPhrase(phraseInput);
-            log.info("Phrase saved successfully: {}", savedPhrase.phrase());
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedPhrase);
-        } catch (UnsupportedOperationException e) {
-            log.error("Kafka service is disabled: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new PhraseOutput(e.getMessage()));
-        } catch (ResponseStatusException e) {
-            log.error("Error saving phrase: {}", e.getReason());
-            throw e;
-        }
+        PhraseOutput savedPhrase = phraseService.saveInputPhrase(phraseInput);
+        log.info("Phrase saved successfully: {}", savedPhrase.phrase());
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedPhrase);
     }
 
     @DeleteMapping
     public ResponseEntity<Void> clearPhrases() {
-        try {
-            phraseServiceImpl.clearPhrases();
-            log.info("All phrases cleared successfully.");
-            return ResponseEntity.noContent().build();
-        } catch (ResponseStatusException e) {
-            log.error("Error clearing phrases: {}", e.getReason());
-            throw e;
-        }
+        phraseService.clearPhrases();
+        log.info("All phrases cleared successfully.");
+        return ResponseEntity.noContent().build();
     }
 }

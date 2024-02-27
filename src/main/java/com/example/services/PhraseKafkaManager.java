@@ -4,9 +4,9 @@ import com.example.dto.PhraseInput;
 import com.example.dto.PhraseOutput;
 
 /**
- * Интерфейс KafkaService определяет контракт для взаимодействия с Kafka для сохранения и обработки фраз.
+ * Интерфейс PhraseKafkaManager определяет контракт для взаимодействия с Kafka для сохранения и обработки фраз.
  */
-public interface KafkaService {
+public interface PhraseKafkaManager {
     /**
      * Сохраняет входящую фразу в Kafka по указанному имени топика.
      *

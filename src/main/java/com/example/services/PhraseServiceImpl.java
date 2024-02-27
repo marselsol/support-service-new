@@ -2,7 +2,7 @@ package com.example.services;
 
 import com.example.dto.PhraseInput;
 import com.example.dto.PhraseOutput;
-import com.example.repository.PhraseStorageImpl;
+import com.example.repository.PhraseStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,13 +10,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class PhraseServiceImpl implements PhraseService {
     @Autowired
-    private PhraseStorageImpl phraseStorage;
+    private PhraseStorage phraseStorage;
     @Autowired(required = false)
-    private KafkaServiceImpl kafkaService;
+    private PhraseKafkaManagerImpl kafkaService;
 
     @Value("${features.kafka-sync}")
     private boolean isKafkaEnabled;
-
 
     @Override
     public PhraseOutput getRandomPhrase() {
@@ -26,7 +25,8 @@ public class PhraseServiceImpl implements PhraseService {
     @Override
     public PhraseOutput saveInputPhrase(PhraseInput phraseInput) {
         if (!isKafkaEnabled) {
-            throw new UnsupportedOperationException("Kafka service is not enabled.");
+            phraseStorage.addPhrase(phraseInput.phrase());
+            return new PhraseOutput(phraseInput.phrase());
         }
         return kafkaService.saveInputPhrase("addPhrases", phraseInput);
     }
